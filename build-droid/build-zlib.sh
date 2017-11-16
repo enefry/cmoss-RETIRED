@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Copyright (c) 2010, Pierre-Olivier Latour
+# Copyright (c) 2011, Mevan Samaratunga
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -11,7 +11,7 @@ set -e
 #     * Redistributions in binary form must reproduce the above copyright
 #       notice, this list of conditions and the following disclaimer in the
 #       documentation and/or other materials provided with the distribution.
-#     * The name of Pierre-Olivier Latour may not be used to endorse or
+#     * The name of Mevan Samaratunga may not be used to endorse or
 #       promote products derived from this software without specific prior
 #       written permission.
 #
@@ -27,18 +27,21 @@ set -e
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Download source
-if [ ! -e "c-ares-${CARES_VERSION}.tar.gz" ]
+echo "zlib-${ZLIB_VERSION}.tar.gz" 
+if [ ! -e "zlib-${ZLIB_VERSION}.tar.gz" ]
 then
-	echo curl $PROXY -O "http://c-ares.haxx.se/download/c-ares-${CARES_VERSION}.tar.gz"
-  curl $PROXY -O "http://c-ares.haxx.se/download/c-ares-${CARES_VERSION}.tar.gz"
+echo curl $PROXY -O "https://zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
+  curl $PROXY -O "https://zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
+else
+  ls -la "zlib-${ZLIB_VERSION}.tar.gz" 
 fi
 
 # Extract source
-rm -rf "c-ares-${CARES_VERSION}"
-tar xvf "c-ares-${CARES_VERSION}.tar.gz"
+rm -rf "zlib-${ZLIB_VERSION}"
+tar -zxf "zlib-${ZLIB_VERSION}.tar.gz"
+pushd "zlib-${ZLIB_VERSION}"
 
 # Build
-pushd "c-ares-${CARES_VERSION}"
 export CC=${DROIDTOOLS}-gcc
 export LD=${DROIDTOOLS}-ld
 export CPP=${DROIDTOOLS}-cpp
@@ -49,31 +52,15 @@ export NM=${DROIDTOOLS}-nm
 export STRIP=${DROIDTOOLS}-strip
 export CXXCPP=${DROIDTOOLS}-cpp
 export RANLIB=${DROIDTOOLS}-ranlib
-export LDFLAGS="-Os -fpic -Wl,-rpath-link=${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib -L${ROOTDIR}/lib"
-export CFLAGS="-Os -pipe -isysroot ${SYSROOT}"
-export CXXFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include" 
+export LDFLAGS="-Os -fpic -nostdlib -lc -shared -Wl,-rpath-link=${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib -L${ROOTDIR}/lib"
+export CFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include -Dunix"
+export CXXFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
 
-./configure --host=${ARCH}-android-linux --target=${PLATFORM} --prefix=${ROOTDIR}
+./configure --prefix="${ROOTDIR}" --static
 
-# Fix libtool to not create versioned shared libraries
-mv "libtool" "libtool~"
-sed "s/library_names_spec=\".*\"/library_names_spec=\"~##~libname~##~{shared_ext}\"/" libtool~ > libtool~1
-sed "s/soname_spec=\".*\"/soname_spec=\"~##~{libname}~##~{shared_ext}\"/" libtool~1 > libtool~2
-sed "s/~##~/\\\\$/g" libtool~2 > libtool
-chmod u+x libtool
-
-# Fix ares.h to compile on linux based systems
-mv "ares.h" "ares.h~"
-sed 's/#include <sys\/types.h>/#include <sys\/select.h>\
-#include <sys\/types.h>/' ares.h~ > ares.h
-
-# Fix ares_config.h file
-mv "ares_config.h" "ares_config.h~"
-sed 's/#define HAVE_ARPA_NAMESER_H 1//' ares_config.h~ > ares_config.h
-
-make
-make install
+make install CC="${CC}" CFLAGS="${CFLAGS}" RANLIB="${RANLIB}" LDFLAGS="${LDFLAGS}" PREFIX="${ROOTDIR}"
+#make && make install
 popd
 
 # Clean up
-rm -rf "c-ares-${CARES_VERSION}"
+rm -rf zlib-${ZLIB_VERSION}

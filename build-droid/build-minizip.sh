@@ -27,9 +27,13 @@ set -e
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Download source
+echo "unzip${MINIZIP_VERSION}.zip" 
 if [ ! -e "unzip${MINIZIP_VERSION}.zip" ]
 then
+echo curl $PROXY -O "http://www.winimage.com/zLibDll/unzip${MINIZIP_VERSION}.zip"
   curl $PROXY -O "http://www.winimage.com/zLibDll/unzip${MINIZIP_VERSION}.zip"
+else
+  ls -la "unzip${MINIZIP_VERSION}.zip" 
 fi
 
 # Extract source
@@ -37,6 +41,8 @@ rm -rf "unzip${MINIZIP_VERSION}"
 
 mkdir "unzip${MINIZIP_VERSION}"
 pushd "unzip${MINIZIP_VERSION}"
+echo "pwd=" `pwd`
+ls -la  "../unzip${MINIZIP_VERSION}.zip"
 unzip "../unzip${MINIZIP_VERSION}.zip"
 
 # Copy customized make files

@@ -29,6 +29,7 @@ set -e
 # Download source
 if [ ! -e "openssl-${OPENSSL_VERSION}.tar.gz" ]
 then
+echo curl $PROXY -O "http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz"
   curl $PROXY -O "http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz"
 fi
 
@@ -55,14 +56,16 @@ export LDFLAGS="-Os -dynamiclib -fPIC -nostdlib -Wl,-rpath-link=${SYSROOT}/usr/l
 export CFLAGS="-Os -pipe -UOPENSSL_BN_ASM_PART_WORDS -isysroot ${SYSROOT} -I${ROOTDIR}/include"
 export CXXFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
 
-./Configure shared no-asm no-krb5 no-gost zlib-dynamic --openssldir=${ROOTDIR} linux-generic32
-
+./Configure shared no-asm no-gost zlib-dynamic --openssldir=${ROOTDIR} linux-generic32  --prefix="${ROOTDIR}" 
+echo "configure done"
 mv "Makefile" "Makefile~"
 sed "s/\.so\.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)/\.so/" Makefile~ > Makefile~1
-sed "s/\$(SHLIB_MAJOR).\$(SHLIB_MINOR)//" Makefile~1 > Makefile
+sed "s/\.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)//" Makefile~1 > Makefile
 
 make CC="${CC}" CFLAG="${CFLAGS}" SHARED_LDFLAGS="${LDFLAGS}"
+echo "make done"
 make install
+echo "make install done"
 popd
 
 # Clean up

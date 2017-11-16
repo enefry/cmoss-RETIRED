@@ -29,7 +29,8 @@ set -e
 # Download source
 if [ ! -e "libssh2-${LIBSSH2_VERSION}.tar.gz" ]
 then
-  curl $PROXY -O "http://www.libssh2.org/download/libssh2-${LIBSSH2_VERSION}.tar.gz"
+echo  
+  wget "http://www.libssh2.org/download/libssh2-${LIBSSH2_VERSION}.tar.gz"
 fi
 
 # Extract source
@@ -38,19 +39,19 @@ tar xvf "libssh2-${LIBSSH2_VERSION}.tar.gz"
 
 # Build
 pushd "libssh2-${LIBSSH2_VERSION}"
-export CC=${DROIDTOOLS}-gcc
-export LD=${DROIDTOOLS}-ld
-export CPP=${DROIDTOOLS}-cpp
-export CXX=${DROIDTOOLS}-g++
-export AR=${DROIDTOOLS}-ar
-export AS=${DROIDTOOLS}-as
-export NM=${DROIDTOOLS}-nm
-export STRIP=${DROIDTOOLS}-strip
-export CXXCPP=${DROIDTOOLS}-cpp
-export RANLIB=${DROIDTOOLS}-ranlib
-export LDFLAGS="-Os -fpic -Wl,-rpath-link=${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib -L${ROOTDIR}/lib -lz -lgpg-error -lgcrypt -lcrypto -lssl"
-export CFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
-export CXXFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
+CC=${DROIDTOOLS}-gcc
+LD=${DROIDTOOLS}-ld
+CPP=${DROIDTOOLS}-cpp
+CXX=${DROIDTOOLS}-g++
+AR=${DROIDTOOLS}-ar
+AS=${DROIDTOOLS}-as
+NM=${DROIDTOOLS}-nm
+STRIP=${DROIDTOOLS}-strip
+CXXCPP=${DROIDTOOLS}-cpp
+RANLIB=${DROIDTOOLS}-ranlib
+LDFLAGS="-Os -fpic -Wl,-rpath-link=${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib -L${ROOTDIR}/lib -lz -lgpg-error -lgcrypt -lcrypto -lssl"
+CFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
+CXXFLAGS="-Os -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
 
 ./configure --host=${ARCH}-android-linux --target=${PLATFORM} --prefix=${ROOTDIR} --with-libz --with-libz-prefix=${ROOTDIR} --with-openssl --with-libssl-prefix=${ROOTDIR} --with-libgcrypt --with-libgcrypt-prefix=${ROOTDIR} --with-libssl-prefix=${ROOTDIR} CFLAGS="${CFLAGS}"
 
@@ -64,6 +65,5 @@ chmod u+x libtool
 make
 make install
 popd
-
 # Clean up
 rm -rf "libssh2-${LIBSSH2_VERSION}"

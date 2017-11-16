@@ -1,0 +1,27 @@
+INCLUDEDIRS =
+
+OBJS = sqlite3.o
+
+libsqlite3.so : ${OBJS}
+	${CC} ${LDFLAGS} -o $@ $?
+
+libsqlite3.a : ${OBJS}
+	${AR} rv $@ $?
+	${RANLIB} $@
+
+sqlite3.o : sqlite3.c
+	${CC} -c $? ${CFLAGS} ${INCLUDEDIRS}
+
+install : libsqlite3.a libsqlite3.so
+	if ( test ! -d ${PREFIX}/lib ) ; then mkdir -p ${PREFIX}/lib ; fi
+	#if ( test ! -d ${PREFIX}/include/sqlite3 ) ; then mkdir -p ${PREFIX}/include/sqlite3 ; fi
+	mv -f libsqlite3.a ${PREFIX}/lib
+	mv -f libsqlite3.so ${PREFIX}/lib
+	cp -f *.h ${PREFIX}/include/
+	rm *.o
+
+clean :
+	rm *.o
+	rm -f libsqlite3.*
+
+

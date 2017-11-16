@@ -38,7 +38,8 @@ BOOST_SOURCE_NAME=boost_${BOOST_VERSION//./_}
 # Download source
 if [ ! -e "${BOOST_SOURCE_NAME}.tar.gz" ]
 then
-  curl $PROXY -O "http://surfnet.dl.sourceforge.net/project/boost/boost/${BOOST_VERSION}/${BOOST_SOURCE_NAME}.tar.gz"
+  echo curl $PROXY -O "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/${BOOST_SOURCE_NAME}.tar.gz"
+  curl $PROXY -O "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/${BOOST_SOURCE_NAME}.tar.gz"
 fi
 
 # Extract source

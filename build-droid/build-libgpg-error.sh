@@ -33,8 +33,8 @@ then
 fi
 
 # Extract source
-rm -rf "libgpg-error-${LIBGPG_ERROR_VERSION}"
-tar xvjf "libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2"
+#rm -rf "libgpg-error-${LIBGPG_ERROR_VERSION}"
+#tar xvjf "libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2"
 
 # Build
 pushd "libgpg-error-${LIBGPG_ERROR_VERSION}"
@@ -64,6 +64,6 @@ chmod u+x libtool
 make
 make install
 popd
-
+exit -1
 # Clean up
 rm -rf "libgpg-error-${LIBGPG_ERROR_VERSION}"
